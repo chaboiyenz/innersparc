@@ -10,11 +10,12 @@ urlpatterns = [
     path('signin/', views.signin, name='signin'),  
     path('signout/', views.signout, name='signout'), 
     path('signup/', views.signup, name='signup'),
-    path('profile/', views.profile, name='profile'), 
-    path('dashboard/', views.dashboard, name='dashboard'),
+    path('profile/<int:id>/', views.profile, name='profile'),
+    path('dashboard/', dashboard, name='dashboard'),
+    path('api/monthly-sales/', monthly_sales_data, name='monthly_sales_data'),
     path('approve/', views.approve, name='approve'), 
     path('approve-user/<int:profile_id>/', approve_user, name='approve_user'),
-    path('reject-user/<int:profile_id>/', reject_user, name='reject_user'), # Admin view for user approval
+    path('reject-user/<int:profile_id>/', reject_user, name='reject_user'),
 ]
 
 if settings.DEBUG:

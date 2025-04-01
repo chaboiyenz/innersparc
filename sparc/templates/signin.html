@@ -1,25 +1,101 @@
 {% extends "index.html" %}
-
+{% load static %}
+{% load humanize %}
 {% block content %}
-<div class="max-w-md mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
-    {% if user.is_authenticated %}
-        <h2 class="text-2xl font-bold text-green-600">Welcome, {{ user.username }}!</h2>
-        <a href="{% url 'signout' %}" class="block mt-4 text-red-500">Logout</a>
-    {% else %}
-        <h2 class="text-2xl font-bold text-gray-800">Sign In</h2>
-        <form method="post" class="mt-4">
-            {% csrf_token %}
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Username</label>
-                <input type="text" name="username" required class="w-full border p-2 rounded">
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    brand: {
+                        blue: '#222689',
+                        green: '#1C7D38',
+                        orange: '#FF9132'
+                    }
+                },
+                fontFamily: {
+                    'poppins': ['Poppins', 'sans-serif']
+                }
+            }
+        }
+    }
+</script>
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
+</style>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden max-w-lg w-full">
+        <!-- Image on top - smaller height -->
+        <div class="relative h-36">
+            <div class="absolute inset-0 bg-gradient-to-r from-brand-blue/80 via-brand-green/80 to-brand-orange/80 z-10"></div>
+            <img src="{% static 'media/innersparc.jpg' %}" class="w-full h-full object-cover">
+            <div class="absolute inset-0 flex items-center justify-center z-20">
+                <div class="text-white text-center">
+                    <div class="text-2xl font-bold mb-0.5">Inner SPARC Portal</div>
+                    <p class="text-xs opacity-90">Real Estate Excellence</p>
+                </div>
             </div>
-            <div class="mt-4">
-                <label class="block text-sm font-medium text-gray-700">Password</label>
-                <input type="password" name="password" required class="w-full border p-2 rounded">
+        </div>
+        
+        <!-- Login form -->
+        <div class="p-5">
+            {% if user.is_authenticated %}
+                <h2 class="text-xl font-semibold text-gray-800 mb-1">Welcome, {{ user.username }}!</h2>
+                <a href="{% url 'signout' %}" class="block mt-4 text-brand-orange font-medium hover:underline">Logout</a>
+            {% else %}
+                <h2 class="text-xl font-semibold text-gray-800 mb-1">Sign In</h2>
+                <p class="text-gray-500 mb-4 text-xs">Please sign in to your account</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Username</label>
+                        <div class="relative">
+                            <input type="text" name="username" required 
+                                   class="w-full bg-gray-50 border border-gray-200 p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue transition">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="flex justify-between mb-1">
+                            <label class="block text-xs font-medium text-gray-700">Password</label>
+                            <a href="#" class="text-xs text-brand-green hover:underline">Forgot?</a>
+                        </div>
+                        <div class="relative">
+                            <input type="password" name="password" required 
+                                   class="w-full bg-gray-50 border border-gray-200 p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue transition">
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center mb-4">
+                        <input id="remember-me" name="remember-me" type="checkbox" 
+                               class="h-3 w-3 text-brand-green focus:ring-brand-green/50 border-gray-300 rounded">
+                        <label for="remember-me" class="ml-2 block text-xs text-gray-700">Remember me</label>
+                    </div>
+                    
+                    <button type="submit" 
+                            class="w-full bg-brand-blue hover:bg-brand-blue/90 text-white p-2 rounded-lg transition duration-200 font-medium shadow-sm text-sm">
+                        Sign In
+                    </button>
+                </form>
+                
+                <div class="mt-4 text-center">
+                    <p class="text-gray-600 text-xs">Don't have an account? 
+                        <a href="{% url 'signup' %}" class="text-brand-orange font-medium hover:underline">Create Account</a>
+                    </p>
+                </div>
+            {% endif %}
+            
+            <div class="mt-4 pt-3 border-t border-gray-100">
+                <div class="flex justify-center space-x-1">
+                    <div class="w-12 h-1 rounded-full bg-brand-blue opacity-80"></div>
+                    <div class="w-12 h-1 rounded-full bg-brand-green opacity-80"></div>
+                    <div class="w-6 h-1 rounded-full bg-brand-orange opacity-80"></div>
+                </div>
             </div>
-            <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded mt-4">Sign In</button>
-        </form>
-        <p class="mt-4 text-gray-500">Don't have an account? <a href="{% url 'signup' %}" class="text-blue-600">Sign Up</a></p>
-    {% endif %}
-</div>
+        </div>
+    </div>
+</body>
 {% endblock %}
