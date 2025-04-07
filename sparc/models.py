@@ -42,10 +42,13 @@ class Sale(models.Model):
     property_name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=12, decimal_places=2)
     agent = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='sales')
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')  # New field
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return f"{self.property_name} - ₱{self.price:,} ({self.get_status_display()})"
+<<<<<<< HEAD
     
     
 class SalesData(models.Model):
@@ -56,3 +59,5 @@ class SalesData(models.Model):
 
     def __str__(self):
         return f"{self.developer} - Active Sales: {self.active_sales}, Cancelled Sales: {self.cancelled_sales}"
+=======
+>>>>>>> 8c64c6fb7d8789c872ad0e5d2bf5c041c82a5acf

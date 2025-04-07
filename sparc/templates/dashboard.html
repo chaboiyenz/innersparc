@@ -3,44 +3,42 @@
 {% load humanize %}
 {% load static %}
 
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
 <div class="flex flex-col md:flex-row gap-6">
-    <!-- 🔹 Top Sales Section -->
     <div class="bg-white p-6 rounded-lg shadow-lg flex-[2]">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-bold text-blue-800">Top Sales</h2>
-            <!-- Add Sale Button -->
             <button onclick="openModal()" class="bg-green-600 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-700">
                 + Add Sale
             </button>
         </div>
+        
+        <!-- Analytics Section -->
+        <div class="grid grid-cols-2 gap-4 mb-6 p-4 bg-gray-100 rounded-lg">
+            <div class="p-4 bg-green-200 rounded-lg text-center">
+                <h3 class="text-lg font-bold">Total Sales</h3>
+                <p class="text-2xl font-semibold">₱ {{ total_sales|intcomma }}</p>
+            </div>
+            <div class="p-4 bg-blue-200 rounded-lg text-center">
+                <h3 class="text-lg font-bold">Total Active Sales</h3>
+                <p class="text-2xl font-semibold"><br> </p>
+            </div>
+            <div class="p-4 bg-orange-200 rounded-lg text-center">
+                <h3 class="text-lg font-bold">Total Cancelled Sales</h3>
+                <p class="text-2xl font-semibold"><br></p>
+            </div>
+            <div class="p-4 bg-purple-200 rounded-lg text-center">
+                <h3 class="text-lg font-bold">Total Agents Contributed</h3>
+                <p class="text-2xl font-semibold"><br></p>
+            </div>
+        </div>
+        <canvas id="monthlySalesChart"></canvas>
 
-        <table class="w-full border-collapse border border-gray-300">
-            <thead>
-                <tr class="bg-green-700 text-white">
-                    <th class="border border-gray-300 p-2">Property ID</th>
-                    <th class="border border-gray-300 p-2">Property</th>
-                    <th class="border border-gray-300 p-2">Price</th>
-                    <th class="border border-gray-300 p-2">Agent</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sale in sales %}
-                <tr class="border border-gray-300">
-                    <td class="border border-gray-300 p-2 text-center">{{ sale.property_id }}</td>
-                    <td class="border border-gray-300 p-2">{{ sale.property_name }}</td>
-                    <td class="border border-gray-300 p-2 text-right">₱ {{ sale.price|intcomma }}</td>
-                    <td class="border border-gray-300 p-2">{{ sale.agent.user.username }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="text-center p-4 text-gray-500">No sales recorded yet.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
 
-    <!-- 🔹 Top Agents Section -->
     <div class="bg-white p-6 rounded-lg shadow-lg flex-1">
         <h2 class="text-2xl font-bold mb-4 text-center text-blue-800">Top Agents</h2>
         <table class="w-full border-collapse border border-gray-300">
@@ -57,9 +55,11 @@
                 <tr class="border border-gray-300">
                     <td class="border border-gray-300 p-2 text-center">{{ forloop.counter }}</td>
                     <td class="border border-gray-300 p-2 text-center">
-                        <img src="{{ agent.image.url }}" 
-                             alt="{{ agent.user.username }}" class="w-12 h-12 rounded-full mx-auto">
-                        <div class="text-center">{{ agent.user.username }}</div>
+                        <a href="{% url 'profile' agent.id %}" class="block text-center hover:underline text-blue-600">
+                            <img src="{{ agent.image.url }}" 
+                                 alt="{{ agent.user.username }}" class="w-12 h-12 rounded-full mx-auto">
+                            <div class="text-center">{{ agent.user.username }}</div>
+                        </a>
                     </td>
                     <td class="border border-gray-300 p-2 text-center">{{ agent.team.name }}</td>
                     <td class="border border-gray-300 p-2 text-right">₱ {{ agent.sales_volume|intcomma }}</td>
@@ -120,5 +120,44 @@
     }
 </script>
 
+<<<<<<< HEAD
+=======
+<script>
+    async function fetchMonthlySales() {
+        const response = await fetch('{% url "monthly_sales_data" %}');
+        const data = await response.json();
+
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const salesData = new Array(12).fill(0);
+
+        for (const [month, total] of Object.entries(data)) {
+            salesData[parseInt(month) - 1] = total;
+        }
+
+        const ctx = document.getElementById('monthlySalesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Total Sales (₱)',
+                    data: salesData,
+                    backgroundColor: 'rgba(34, 38, 137, 0.6)',
+                    borderColor: 'rgba(34, 38, 137, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+    fetchMonthlySales();
+</script>
+
+>>>>>>> 8c64c6fb7d8789c872ad0e5d2bf5c041c82a5acf
 
 {% endblock %}

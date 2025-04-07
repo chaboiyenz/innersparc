@@ -5,6 +5,7 @@ from django.contrib import messages
 from .forms import *
 from .models import *
 from django.contrib.auth.decorators import login_required
+<<<<<<< HEAD
 from django.http import HttpResponseForbidden
 from django.db.models import Sum
 from django.urls import reverse
@@ -13,13 +14,17 @@ from .models import SalesData
 from decimal import Decimal, InvalidOperation
 from datetime import datetime
 
+=======
+from django.http import HttpResponseForbidden, JsonResponse
+from django.db.models import Sum, F
+>>>>>>> 8c64c6fb7d8789c872ad0e5d2bf5c041c82a5acf
 
 
 def home(request):
     return render(request, 'index.html')
 
 def navbar(request):
-    return render(request, 'navbar.html')
+    return render(request, 'navbar.html', {'user': request.user})
 
 def signin(request):
     if request.user.is_authenticated:
@@ -54,36 +59,46 @@ def signup(request):
     
     return render(request, "signup.html", {"form": form})
 
-@login_required(login_url='signin')  # Redirects if not logged in
-def profile(request):
-    return render(request, 'profile.html')
+@login_required(login_url='signin')
+def profile(request, id):
+    user_profile = get_object_or_404(Profile, id=id)  # Fetch profile by ID
+    return render(request, 'profile.html', {'user_profile': user_profile})
 
+
+def monthly_sales_data(request):
+    sales = (
+        Sale.objects.filter(status='active')
+        .annotate(month=F('created_at__month'))
+        .values('month')
+        .annotate(total_price=Sum('price'))
+        .order_by('month')
+    )
+
+    data = {str(item["month"]): float(item["total_price"]) for item in sales}
+    return JsonResponse(data)
 
 @login_required(login_url='signin')
 def dashboard(request):
     user_profile = Profile.objects.get(user=request.user)
 
-    # Get all sales from approved agents
+    # Compute sales stats
     sales = Sale.objects.filter(agent__is_approved=True).order_by('-price')
-
-    # Get all approved agents with their total sales volume
     agents = Profile.objects.filter(is_approved=True).annotate(
         sales_volume=Sum('sales__price')
     ).order_by('-sales_volume')
 
-    form = SaleForm(request.POST or None)  # Initialize form
-
-    if request.method == 'POST':
-        if form.is_valid():
-            form.save()  # ✅ Save directly since 'agent' is now included
-            return redirect('dashboard')  # Refresh the page
-        else:
-            print("Form errors:", form.errors)  # Debugging
+    total_sales = sales.aggregate(total=Sum('price'))['total'] or 0
+    active_sales = sales.filter(status='active').aggregate(total=Sum('price'))['total'] or 0
+    cancelled_sales = sales.filter(status='cancelled').aggregate(total=Sum('price'))['total'] or 0
+    total_agents = agents.count()
 
     return render(request, 'dashboard.html', {
         'sales': sales,
         'agents': agents,
-        'form': form,
+        'total_sales': total_sales,
+        'active_sales': active_sales,
+        'cancelled_sales': cancelled_sales,
+        'total_agents': total_agents,
         'user_profile': user_profile
     })
 
@@ -108,6 +123,7 @@ def reject_user(request, profile_id):
     profile.user.delete()  # Deletes the user and profile
     messages.error(request, f"User {profile.user.username} has been declined.")
     return redirect('approve')
+<<<<<<< HEAD
 
 def developers(request):
     # Example data for sales_data
@@ -224,3 +240,6 @@ def sales_report_view(request):
 def commission(request):
     # Add your logic for the commission view here
     return render(request, 'commission.html')
+=======
+ 
+>>>>>>> 8c64c6fb7d8789c872ad0e5d2bf5c041c82a5acf
